@@ -1,11 +1,6 @@
 app:
   env: dev
   port: 8080
-db:
-  db_name: auth-db
-  db_host: localhost
-  db_port: 5432
-  sslmode: disable
 auth:
   access_token_ttl: 15m
   refresh_token_ttl: 7d

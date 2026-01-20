@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -20,12 +21,12 @@ type AppConfig struct {
 }
 
 type DBConfig struct {
-	Name     string `yaml:"db_name"`
+	Name     string `env:"DB_NAME" env-required:"true"`
 	User     string `env:"DB_USER" env-required:"true"`
 	Password string `env:"DB_PASSWORD" env-required:"true"`
-	Host     string `yaml:"db_host"`
-	Port     string `yaml:"db_port"`
-	SSLMode  string `yaml:"sslmode"`
+	Host     string `env:"DB_HOST" env-required:"true"`
+	Port     string `env:"DB_PORT" env-required:"true"`
+	SSLMode  string `env:"SSL_MODE" env-required:"true"`
 }
 
 type AuthConfig struct {
@@ -46,7 +47,23 @@ func MustLoad(configPath string) (*Config, error) {
 
 	cfg.DB.User = os.Getenv("DB_USER")
 	cfg.DB.Password = os.Getenv("DB_PASSWORD")
+	cfg.DB.Host = os.Getenv("DB_HOST")
+	cfg.DB.Port = os.Getenv("DB_PORT")
+	cfg.DB.Name = os.Getenv("DB_NAME")
+	cfg.DB.SSLMode = os.Getenv("SSL_MODE")
 	cfg.Auth.SecretKey = os.Getenv("SECRET_KEY")
 
 	return &cfg, nil
+}
+
+func (d *DBConfig) DSN() string {
+	return fmt.Sprintf(
+		"host=%s port=%s dbname=%s user=%s password=%s sslmode=%s",
+		d.Host,
+		d.Port,
+		d.Name,
+		d.User,
+		d.Password,
+		d.SSLMode,
+	)
 }
